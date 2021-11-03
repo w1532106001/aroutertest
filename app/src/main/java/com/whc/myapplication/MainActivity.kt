@@ -13,12 +13,16 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button).apply {
             setOnClickListener {
                 ARouter.getInstance().build(AppConstance.TEST_ACTIVITY_2_URL)
-                    .withString("user",User().apply {
+                    .withObject("user1",User().apply {
                         username = "w"
                         age = 1
                         password = "123"
-                    }.toString())
-//                    .withObject("user2",User("d",1123,"123456"))
+                    })
+                    .withObject("user2",User().apply {
+                        username = "w"
+                        age = 123
+                        password = "123"
+                    })
                     .navigation()
             }
         }
