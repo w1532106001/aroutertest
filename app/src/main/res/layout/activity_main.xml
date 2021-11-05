@@ -16,4 +16,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/jump_test_activity" />
+
+    <ImageView
+        android:id="@+id/imv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/test2"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
