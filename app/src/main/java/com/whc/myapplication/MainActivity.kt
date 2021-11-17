@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.graphics.drawable.toBitmap
+import androidx.work.*
 import com.alibaba.android.arouter.launcher.ARouter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.model.GlideUrl
@@ -21,11 +22,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.net.HttpURLConnection
 import java.net.URL
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var service:IMyAidlInterface
+    lateinit var service: IMyAidlInterface
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,9 +58,13 @@ class MainActivity : AppCompatActivity() {
                     age = 18
                     password = "123"
                 }
-                service.sayHello("你好",1,u)
+                service.sayHello("你好", 1, u)
 
-                Toast.makeText(this@MainActivity, "user:"+service.getUserAge(u), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@MainActivity,
+                    "user:" + service.getUserAge(u),
+                    Toast.LENGTH_SHORT
+                ).show()
 //                unbindService(sc)
 //                finish()
 //                stopService(intent)
@@ -66,7 +73,19 @@ class MainActivity : AppCompatActivity() {
         val et = findViewById<EditText>(R.id.et)
         findViewById<Button>(R.id.b3).apply {
             setOnClickListener {
-                service.download(et.text.toString())
+                val workRequest =
+                    PeriodicWorkRequestBuilder<UploadWorker>(5, TimeUnit.SECONDS).build()
+                WorkManager.getInstance(context)
+                    .enqueueUniquePeriodicWork("test"
+                        ,ExistingPeriodicWorkPolicy.KEEP,workRequest)
+                WorkManager.getInstance(context).getWorkInfosByTagLiveData("test").observe(this@MainActivity){
+                    if(it.isNotEmpty() && (WorkInfo.State.SUCCEEDED == it[0].state)){
+                        Toast.makeText(this@MainActivity, "任务完成", Toast.LENGTH_SHORT).show()
+                    }
+                }
+//                val workRequest = OneTimeWorkRequestBuilder<UploadWorker>().build()
+//                WorkManager.getInstance(context).enqueue(workRequest)
+//                service.download(et.text.toString())
 
 //                unbindService(sc)
 //                finish()
